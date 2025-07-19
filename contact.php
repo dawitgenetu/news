@@ -35,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="space-y-6">
                 <div class="flex items-start space-x-4">
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-map-marker-alt text-red-700"></i>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-map-marker-alt text-blue-700"></i>
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Address</h3>
@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="flex items-start space-x-4">
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-phone text-red-700"></i>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-phone text-blue-700"></i>
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Phone</h3>
@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="flex items-start space-x-4">
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-envelope text-red-700"></i>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-envelope text-blue-700"></i>
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Email</h3>
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="flex items-start space-x-4">
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-clock text-red-700"></i>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-clock text-blue-700"></i>
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Working Hours</h3>
@@ -82,16 +82,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mt-8">
                 <h3 class="font-semibold text-gray-900 mb-4">Follow Us</h3>
                 <div class="flex space-x-4">
-                    <a href="#" class="bg-red-100 p-3 rounded-full text-red-700 hover:bg-red-200 transition-colors">
+                    <a href="#" class="bg-blue-100 p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" class="bg-red-100 p-3 rounded-full text-red-700 hover:bg-red-200 transition-colors">
+                    <a href="#" class="bg-blue-100 p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="bg-red-100 p-3 rounded-full text-red-700 hover:bg-red-200 transition-colors">
+                    <a href="#" class="bg-blue-100 p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" class="bg-red-100 p-3 rounded-full text-red-700 hover:bg-red-200 transition-colors">
+                    <a href="#" class="bg-blue-100 p-3 rounded-full text-blue-700 hover:bg-blue-200 transition-colors">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
                 </div>
@@ -119,29 +119,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                         <input type="text" id="name" name="name" required
-                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                         <input type="email" id="email" name="email" required
-                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     </div>
                 </div>
 
                 <div>
                     <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
                     <input type="text" id="subject" name="subject" required
-                           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                           class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 </div>
 
                 <div>
                     <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
                     <textarea id="message" name="message" rows="6" required
-                              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"></textarea>
+                              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
 
                 <button type="submit" 
-                        class="w-full bg-red-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-800 transition-colors">
+                        class="w-full bg-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors">
                     Send Message
                 </button>
             </form>

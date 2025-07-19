@@ -26,14 +26,14 @@ $latestBusiness = $article->getByCategory('business', 3);
                                 <img src="<?php echo htmlspecialchars($fa['image_url']); ?>" alt="<?php echo htmlspecialchars($fa['title']); ?>" class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 p-8 w-full">
-                                    <span class="inline-block bg-red-700 text-white px-3 py-1 rounded-full text-xs mb-2">Top Story</span>
-                                    <h2 class="text-3xl md:text-4xl font-bold mb-2 group-hover:text-red-400 transition-colors">
+                                    <span class="inline-block bg-blue-700 text-white px-3 py-1 rounded-full text-xs mb-2">Top Story</span>
+                                    <h2 class="text-3xl md:text-4xl font-bold mb-2 group-hover:text-blue-400 transition-colors">
                                         <?php echo htmlspecialchars($fa['title']); ?>
                                     </h2>
                                     <p class="text-gray-200 text-lg max-w-2xl mb-4">
                                         <?php echo htmlspecialchars(substr($fa['content'], 0, 120)) . '...'; ?>
                                     </p>
-                                    <a href="article.php?id=<?php echo $fa['id']; ?>" class="inline-block mt-2 px-6 py-2 bg-red-600 hover:bg-red-700 rounded-full font-semibold text-white transition">Read More</a>
+                                    <a href="article.php?id=<?php echo $fa['id']; ?>" class="inline-block mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full font-semibold text-white transition">Read More</a>
                                 </div>
                             </div>
                         </div>
@@ -58,7 +58,7 @@ $latestBusiness = $article->getByCategory('business', 3);
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
                     <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors">
                             <?php echo htmlspecialchars($article['title']); ?>
                         </h3>
                         <p class="text-gray-600 mb-4">
@@ -80,7 +80,7 @@ $latestBusiness = $article->getByCategory('business', 3);
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
                     <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors">
                             <?php echo htmlspecialchars($article['title']); ?>
                         </h3>
                         <p class="text-gray-600 mb-4">
@@ -102,7 +102,7 @@ $latestBusiness = $article->getByCategory('business', 3);
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
                     <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-blue-700 transition-colors">
                             <?php echo htmlspecialchars($article['title']); ?>
                         </h3>
                         <p class="text-gray-600 mb-4">
@@ -123,8 +123,8 @@ $latestBusiness = $article->getByCategory('business', 3);
             <h2 class="text-3xl font-bold mb-8">Browse by Category</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <a href="news.php" class="block bg-white rounded-xl shadow hover:shadow-lg transition p-6 text-center group">
-                    <i class="fa-solid fa-newspaper text-3xl text-red-600 mb-2"></i>
-                    <div class="font-semibold text-lg text-gray-900 group-hover:text-red-700">News</div>
+                    <i class="fa-solid fa-newspaper text-3xl text-blue-600 mb-2"></i>
+                    <div class="font-semibold text-lg text-gray-900 group-hover:text-blue-700">News</div>
                 </a>
                 <a href="politics.php" class="block bg-white rounded-xl shadow hover:shadow-lg transition p-6 text-center group">
                     <i class="fa-solid fa-landmark text-3xl text-blue-600 mb-2"></i>

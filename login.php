@@ -42,8 +42,8 @@ require_once 'includes/header.php';
         <div class="text-center">
             <div class="flex justify-center mb-6">
                 <div class="relative">
-                    <i class="fa-solid fa-newspaper text-6xl text-red-700"></i>
-                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
+                    <i class="fa-solid fa-newspaper text-6xl text-blue-700"></i>
+                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
                 </div>
             </div>
             <h2 class="text-3xl font-bold text-gray-900 mb-2">
@@ -73,7 +73,7 @@ require_once 'includes/header.php';
                            name="email" 
                            type="email" 
                            required 
-                           class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm transition-colors"
+                           class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
                            placeholder="Enter your email">
                 </div>
                 <div>
@@ -84,7 +84,7 @@ require_once 'includes/header.php';
                            name="password" 
                            type="password" 
                            required 
-                           class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm transition-colors"
+                           class="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors"
                            placeholder="Enter your password">
                 </div>
             </div>
@@ -94,13 +94,13 @@ require_once 'includes/header.php';
                     <input id="remember-me" 
                            name="remember-me" 
                            type="checkbox" 
-                           class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                     <label for="remember-me" class="ml-2 block text-sm text-gray-700">
                         Remember me
                     </label>
                 </div>
                 <div class="text-sm">
-                    <a href="#" class="font-medium text-red-600 hover:text-red-500 transition-colors">
+                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                         Forgot your password?
                     </a>
                 </div>
@@ -108,9 +108,9 @@ require_once 'includes/header.php';
 
             <div>
                 <button type="submit" 
-                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors hover:shadow-lg">
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors hover:shadow-lg">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <i class="fas fa-sign-in-alt text-red-500 group-hover:text-red-400"></i>
+                        <i class="fas fa-sign-in-alt text-blue-500 group-hover:text-blue-400"></i>
                     </span>
                     Sign in
                 </button>
@@ -120,7 +120,7 @@ require_once 'includes/header.php';
         <div class="text-center">
             <p class="text-sm text-gray-600">
                 Don't have an account? 
-                <a href="register.php" class="font-medium text-red-600 hover:text-red-500 transition-colors">
+                <a href="register.php" class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                     Create one here
                 </a>
             </p>
@@ -138,7 +138,7 @@ require_once 'includes/header.php';
 
             <div class="mt-6 grid grid-cols-2 gap-3">
                 <button class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">
-                    <i class="fab fa-google text-red-600 mr-2"></i>
+                    <i class="fab fa-google text-blue-600 mr-2"></i>
                     Google
                 </button>
                 <button class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">

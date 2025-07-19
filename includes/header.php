@@ -79,7 +79,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
         
         .gradient-bg {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         }
         
         .hover-lift {
@@ -103,7 +103,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             left: 0;
             width: 0;
             height: 2px;
-            background: #dc2626;
+            background: #2563eb;
             transition: width 0.3s ease;
         }
         
@@ -126,7 +126,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         
         .search-focus:focus {
             transform: scale(1.02);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
     </style>
 </head>
@@ -136,25 +136,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-6 text-sm">
-                    <div class="flex items-center hover:text-red-400 transition-colors">
+                    <div class="flex items-center hover:text-blue-400 transition-colors">
                         <i class="fa-solid fa-clock mr-2"></i>
                         <span><?php echo date('l, F j, Y'); ?></span>
                     </div>
-                    <div class="flex items-center hover:text-red-400 transition-colors">
+                    <div class="flex items-center hover:text-blue-400 transition-colors">
                         <i class="fa-solid fa-location-dot mr-2"></i>
                         <span>Addis Ababa, Ethiopia</span>
                     </div>
-                    <div class="flex items-center hover:text-red-400 transition-colors">
+                    <div class="flex items-center hover:text-blue-400 transition-colors">
                         <i class="fa-solid fa-temperature-high mr-2"></i>
                         <span>25°C</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="#" class="hover:text-red-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="hover:text-red-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#" class="hover:text-red-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" class="hover:text-red-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" class="hover:text-red-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-telegram"></i></a>
+                    <a href="#" class="hover:text-blue-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="hover:text-blue-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="hover:text-blue-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-blue-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="hover:text-blue-400 transition-colors hover:scale-110 transform duration-200"><i class="fa-brands fa-telegram"></i></a>
                 </div>
             </div>
         </div>
@@ -177,45 +177,45 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </span>
                             <input type="text" name="q" aria-label="Search" autocomplete="off"
                                    placeholder="Search news, topics, or categories (e.g. Politics, Business, Sports, Technology)..."
-                                   class="w-full pl-12 pr-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 search-focus bg-white shadow-sm relative z-20 text-gray-900 placeholder-gray-400"
+                                   class="w-full pl-12 pr-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 search-focus bg-white shadow-sm relative z-20 text-gray-900 placeholder-gray-400"
                                    oninput="liveSuggest(this, 'search-suggestions')" onkeydown="suggestionKeydown(event, 'search-suggestions', this)" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="search-suggestions">
-                            <button type="submit" class="absolute right-4 top-3 text-gray-400 hover:text-red-700 transition-colors z-10">
+                            <button type="submit" class="absolute right-4 top-3 text-gray-400 hover:text-blue-700 transition-colors z-10">
                                 <i class="fa-solid fa-search"></i>
                             </button>
-                            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-red-500 to-red-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
                             <!-- Suggestions Dropdown -->
                             <ul id="search-suggestions" role="listbox" class="hidden absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 text-gray-900">
-                                <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Politics</li>
-                                <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Business</li>
-                                <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Sports</li>
-                                <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Technology</li>
+                                <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Politics</li>
+                                <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Business</li>
+                                <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Sports</li>
+                                <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Technology</li>
                             </ul>
                         </div>
                     </form>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <button class="lg:hidden text-gray-600 hover:text-red-700 transition-colors" id="mobile-menu-button">
+                    <button class="lg:hidden text-gray-600 hover:text-blue-700 transition-colors" id="mobile-menu-button">
                         <i class="fa-solid fa-bars text-2xl"></i>
                     </button>
 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="relative group">
                         <button class="flex items-center bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 focus:outline-none">
-                            <i class="fa-solid fa-user-circle mr-2 text-red-700"></i>
+                            <i class="fa-solid fa-user-circle mr-2 text-blue-700"></i>
                             <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                             <i class="fa-solid fa-chevron-down ml-2 text-xs"></i>
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-3 border border-gray-100 hidden group-hover:block z-50">
-                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors">
+                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                                 <i class="fa-solid fa-user mr-2"></i>Profile
                             </a>
-                            <a href="logout.php" class="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors">
+                            <a href="logout.php" class="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                                 <i class="fa-solid fa-sign-out-alt mr-2"></i>Logout
                             </a>
                         </div>
                     </div>
 <?php else: ?>
-                    <a href="login.php" class="hidden md:block bg-red-700 text-white px-6 py-2 rounded-full hover:bg-red-800 transition-colors hover-lift">
+                    <a href="login.php" class="hidden md:block bg-blue-700 text-white px-6 py-2 rounded-full hover:bg-blue-800 transition-colors hover-lift">
                         <i class="fa-solid fa-user mr-2"></i>
                         Login
                     </a>
@@ -227,43 +227,43 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <nav class="hidden lg:block border-t border-gray-100">
                 <ul class="flex space-x-8 py-4">
                     <li class="dropdown relative group">
-                        <a href="index.php" class="nav-link text-gray-700 hover:text-red-700 font-medium flex items-center py-2">
+                        <a href="index.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium flex items-center py-2">
                             <i class="fa-solid fa-home mr-2"></i>
                             Home
                             <i class="fa-solid fa-chevron-down ml-1 text-xs transition-transform group-hover:rotate-180"></i>
                         </a>
                         <div class="dropdown-menu hidden absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-3 border border-gray-100">
-                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors">
-                                <i class="fa-solid fa-fire mr-2 text-red-500"></i>
+                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                                <i class="fa-solid fa-fire mr-2 text-blue-500"></i>
                                 Latest News
                             </a>
-                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors">
+                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                                 <i class="fa-solid fa-star mr-2 text-yellow-500"></i>
                                 Featured Stories
                             </a>
-                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors">
+                            <a href="#" class="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                                 <i class="fa-solid fa-chart-line mr-2 text-green-500"></i>
                                 Popular Articles
                             </a>
                         </div>
                     </li>
-                    <li><a href="news.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="news.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-newspaper mr-2"></i>News</a></li>
-                    <li><a href="politics.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="politics.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-landmark mr-2"></i>Politics</a></li>
-                    <li><a href="business.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="business.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-briefcase mr-2"></i>Business</a></li>
-                    <li><a href="sport.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="sport.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-futbol mr-2"></i>Sports</a></li>
-                    <li><a href="opinion.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="opinion.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-comments mr-2"></i>Opinion</a></li>
-                    <li><a href="video.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="video.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-video mr-2"></i>Video</a></li>
-                    <li><a href="entertainment.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="entertainment.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-film mr-2"></i>Entertainment</a></li>
-                    <li><a href="business-listings.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="business-listings.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-building mr-2"></i>Business Listings</a></li>
-                    <li><a href="contact.php" class="nav-link text-gray-700 hover:text-red-700 font-medium py-2 flex items-center">
+                    <li><a href="contact.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-envelope mr-2"></i>Contact</a></li>
                 </ul>
             </nav>
@@ -275,10 +275,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <div class="p-6">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center space-x-3">
-                                <i class="fa-solid fa-newspaper text-2xl text-red-700"></i>
-                                <span class="text-xl font-bold text-red-700">Borkena News</span>
+                                <i class="fa-solid fa-newspaper text-2xl text-blue-700"></i>
+                                <span class="text-xl font-bold text-blue-700">Borkena News</span>
                             </div>
-                            <button id="mobile-menu-close" class="text-gray-500 hover:text-red-700">
+                            <button id="mobile-menu-close" class="text-gray-500 hover:text-blue-700">
                                 <i class="fa-solid fa-times text-2xl"></i>
                             </button>
                         </div>
@@ -290,46 +290,46 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 </span>
                                 <input type="text" name="q" aria-label="Search" autocomplete="off"
                                        placeholder="Search news, topics, or categories (e.g. Politics, Business, Sports, Technology)..."
-                                       class="w-full pl-12 pr-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-red-500 bg-gray-50 relative z-20 text-gray-900 placeholder-gray-400"
+                                       class="w-full pl-12 pr-6 py-3 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500 bg-gray-50 relative z-20 text-gray-900 placeholder-gray-400"
                                        oninput="liveSuggest(this, 'search-suggestions-mobile')" onkeydown="suggestionKeydown(event, 'search-suggestions-mobile', this)" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="search-suggestions-mobile">
-                                <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-red-700 transition-colors z-10">
+                                <button type="submit" class="absolute right-3 top-3 text-gray-400 hover:text-blue-700 transition-colors z-10">
                                     <i class="fa-solid fa-search"></i>
                                 </button>
                                 <!-- Suggestions Dropdown -->
                                 <ul id="search-suggestions-mobile" role="listbox" class="hidden absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-30 text-gray-900">
-                                    <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Politics</li>
-                                    <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Business</li>
-                                    <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Sports</li>
-                                    <li class="px-6 py-3 hover:bg-red-50 cursor-pointer">Technology</li>
+                                    <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Politics</li>
+                                    <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Business</li>
+                                    <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Sports</li>
+                                    <li class="px-6 py-3 hover:bg-blue-50 cursor-pointer">Technology</li>
                                 </ul>
                             </div>
                         </form>
                         
                         <ul class="space-y-2">
-                            <li><a href="index.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="index.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-home mr-3 w-5"></i>Home</a></li>
-                            <li><a href="news.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="news.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-newspaper mr-3 w-5"></i>News</a></li>
-                            <li><a href="politics.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="politics.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-landmark mr-3 w-5"></i>Politics</a></li>
-                            <li><a href="business.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="business.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-briefcase mr-3 w-5"></i>Business</a></li>
-                            <li><a href="sport.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="sport.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-futbol mr-3 w-5"></i>Sports</a></li>
-                            <li><a href="opinion.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="opinion.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-comments mr-3 w-5"></i>Opinion</a></li>
-                            <li><a href="video.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="video.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-video mr-3 w-5"></i>Video</a></li>
-                            <li><a href="entertainment.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="entertainment.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-film mr-3 w-5"></i>Entertainment</a></li>
-                            <li><a href="business-listings.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="business-listings.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-building mr-3 w-5"></i>Business Listings</a></li>
-                            <li><a href="contact.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                            <li><a href="contact.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-envelope mr-3 w-5"></i>Contact</a></li>
                         </ul>
                         
                         <div class="mt-8 pt-6 border-t border-gray-200">
-                            <a href="login.php" class="w-full bg-red-700 text-white px-6 py-3 rounded-full hover:bg-red-800 transition-colors block text-center">
+                            <a href="login.php" class="w-full bg-blue-700 text-white px-6 py-3 rounded-full hover:bg-blue-800 transition-colors block text-center">
                                 <i class="fa-solid fa-user mr-2"></i>
                                 Login
                             </a>
@@ -426,7 +426,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             }
             matches.forEach((match, idx) => {
                 const li = document.createElement('li');
-                li.className = 'px-6 py-3 hover:bg-red-50 cursor-pointer';
+                li.className = 'px-6 py-3 hover:bg-blue-50 cursor-pointer';
                 li.setAttribute('role', 'option');
                 li.setAttribute('tabindex', '-1');
                 li.innerHTML = highlightMatch(match, query);

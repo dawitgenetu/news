@@ -4,13 +4,8 @@ set_time_limit(600);
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db_config.php';
 
-// Ensure borkena_images table exists
-$conn->query("CREATE TABLE IF NOT EXISTS borkena_images (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    article_url VARCHAR(512),
-    image_url VARCHAR(512),
-    scraped_at DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+// Ensure borkena_images table exists with local_image_path
+// Remove borkena_images table creation and related logic
 
 // --- CONFIG ---
 $baseUrl = 'https://borkena.com/';
@@ -176,23 +171,71 @@ function extractImageUrl($node, $xpath, $articleUrl = null, $userAgent = null) {
     return '';
 }
 
-function downloadImage($imageUrl, $uploadDir) {
+// Helper to download image and return local path
+function download_and_save_image($imageUrl) {
     $imageData = @file_get_contents($imageUrl);
     if ($imageData === false) {
-        logMessage('Failed to download image: ' . $imageUrl);
         return '';
     }
     $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
     if (!$ext) $ext = 'jpg';
     $filename = uniqid('img_') . '.' . $ext;
+    $uploadDir = __DIR__ . '/uploads/images/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
     $filePath = $uploadDir . $filename;
     if (file_put_contents($filePath, $imageData)) {
-        // Return relative path for use in HTML
         return 'uploads/images/' . $filename;
     } else {
-        logMessage('Failed to save image: ' . $filePath);
         return '';
     }
+}
+
+function extract_featured_image($xpath) {
+    // Try og:image meta tag
+    $meta = $xpath->query('//meta[@property="og:image"]')->item(0);
+    if ($meta) {
+        $url = normalize_image_url($meta->getAttribute('content'));
+        if ($url) return $url;
+    }
+    // Fallback: first <img> in main content
+    $content = $xpath->query("//div[contains(@class, 'tdb_single_content')]")->item(0);
+    if ($content) {
+        foreach ($content->getElementsByTagName('img') as $img) {
+            foreach (['src', 'data-src', 'data-lazy-src', 'data-original'] as $attr) {
+                $url = normalize_image_url($img->getAttribute($attr));
+                if ($url) return $url;
+            }
+        }
+    }
+    return '';
+}
+
+function extract_publish_date($xpath) {
+    $time = $xpath->query('//time')->item(0);
+    if ($time) {
+        $date = $time->getAttribute('datetime') ?: $time->textContent;
+        if ($date) return date('Y-m-d H:i:s', strtotime($date));
+    }
+    $meta = $xpath->query('//meta[@property="article:published_time"]')->item(0);
+    if ($meta) {
+        $date = $meta->getAttribute('content');
+        if ($date) return date('Y-m-d H:i:s', strtotime($date));
+    }
+    return date('Y-m-d H:i:s'); // fallback
+}
+
+function normalize_image_url($url) {
+    $url = html_entity_decode(trim($url));
+    if (!$url) return '';
+    if (strpos($url, '//borkena.com') === 0) $url = 'https:' . $url;
+    if (strpos($url, '/wp-content/uploads/') === 0) $url = 'https://borkena.com' . $url;
+    if (strpos($url, 'https://borkena.com/wp-content/uploads/') === 0) {
+        $url = preg_replace('#(?<!:)//+#', '/', $url);
+        return $url;
+    }
+    return '';
 }
 
 function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
@@ -226,43 +269,33 @@ function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
             echo "Skipping duplicate: $title (URL already exists)\n";
             continue;
         }
-        // Extract image (improved)
-        $image = extractImageUrl($titleNode->parentNode->parentNode, $xpath, $url, $userAgent);
-        // Download image and get local path
-        $localImagePath = '';
-        if ($image) {
-            $localImagePath = downloadImage($image, __DIR__ . '/uploads/images/');
+        // Fetch article HTML
+        $articleHtml = fetchUrl($url, $userAgent);
+        if (!$articleHtml) {
+            echo "Warning: Could not fetch article HTML for $url\n";
+            continue;
         }
-        // Fetch full article content
-        echo "Fetching content for: $title\n";
+        $adoc = new DOMDocument();
+        @$adoc->loadHTML($articleHtml);
+        $axp = new DOMXPath($adoc);
+        // Featured image
+        $image_url = extract_featured_image($axp);
+        $localImagePath = $image_url ? download_and_save_image($image_url) : '';
+        // Content
         $content = fetchArticleContent($url, $userAgent);
         if (!$content) {
             echo "Warning: No content found for $url\n";
             logMessage("No content found for $url");
         }
-        // Excerpt
         $excerpt = get_excerpt($content, 200);
-        // Date (try to extract from article page)
-        $published_at = null;
-        $articleHtml = fetchUrl($url, $userAgent);
-        if ($articleHtml) {
-            $adoc = new DOMDocument();
-            @$adoc->loadHTML($articleHtml);
-            $axp = new DOMXPath($adoc);
-            $dateNode = $axp->query("//time")->item(0);
-            if ($dateNode) {
-                $published_at = parseArticleDate($dateNode->getAttribute('datetime') ?: $dateNode->textContent);
-            }
-        }
-        if (!$published_at) $published_at = date('Y-m-d H:i:s');
-        // Get or create category
+        $published_at = extract_publish_date($axp);
         $categoryId = getOrCreateCategoryId($db, ucfirst($categoryName));
-        // Insert article
         try {
             $slug = generate_slug($title);
-            $stmt = $db->prepare("INSERT INTO articles (title, slug, content, excerpt, image_url, url, category_id, status, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'published', ?)");
-            $stmt->execute([$title, $slug, $content, $excerpt, $localImagePath, $url, $categoryId, $published_at]);
-            echo "Inserted: $title (Category: $categoryName)\n";
+            $stmt = $db->prepare("INSERT INTO articles (title, slug, content, excerpt, image_url, local_image_path, url, category_id, status, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'published', ?)");
+            $stmt->execute([$title, $slug, $content, $excerpt, $image_url, $localImagePath, $url, $categoryId, $published_at]);
+            echo "Inserted: $title | $published_at (Category: $categoryName)\n";
+            logMessage("Inserted: $title | $published_at (Category: $categoryName)");
             $count++;
         } catch (Exception $e) {
             echo "Error inserting '$title': " . $e->getMessage() . "\n";
@@ -304,9 +337,26 @@ function get_borkena_article_images($article_url) {
     libxml_clear_errors();
 
     $images = [];
+    $xpath = new DOMXPath($dom);
+
+    // 1. Try to get the featured image from meta tags
+    $metaImage = $xpath->query('//meta[@property="og:image"]')->item(0);
+    if ($metaImage) {
+        $featured_url = html_entity_decode(trim($metaImage->getAttribute('content')));
+        if ($featured_url && strpos($featured_url, 'borkena.com/wp-content/uploads/') !== false) {
+            // Normalize protocol-relative and relative URLs
+            if (strpos($featured_url, '//borkena.com') === 0) $featured_url = 'https:' . $featured_url;
+            if (strpos($featured_url, '/wp-content/uploads/') === 0) $featured_url = 'https://borkena.com' . $featured_url;
+            if (strpos($featured_url, 'https://borkena.com/wp-content/uploads/') === 0) {
+                $featured_url = preg_replace('#(?<!:)//+#', '/', $featured_url);
+                $images[] = $featured_url;
+            }
+        }
+    }
+
+    // 2. Then, get images from .tdb_single_content as before
     echo "<h3>Debug: All <img> tags found in the HTML</h3>";
     echo "<ul style='font-size:13px;'>";
-    $xpath = new DOMXPath($dom);
     $contentNode = $xpath->query("//div[contains(@class, 'tdb_single_content')]")->item(0);
     if ($contentNode) {
         foreach ($contentNode->getElementsByTagName('img') as $img) {
@@ -321,20 +371,13 @@ function get_borkena_article_images($article_url) {
             $img_url = $src ?: $data_src ?: $data_lazy_src ?: $data_original ?: $data_srcset;
 
             // Normalize protocol-relative URLs
-            if (strpos($img_url, '//borkena.com/wp-content/uploads/') === 0) {
-                $img_url = 'https:' . $img_url;
-            }
-
-            // Normalize relative URLs
-            if (strpos($img_url, '/wp-content/uploads/') === 0) {
-                $img_url = 'https://borkena.com' . $img_url;
-            }
-
-            // Only accept images from borkena.com uploads
+            if (strpos($img_url, '//borkena.com/wp-content/uploads/') === 0) $img_url = 'https:' . $img_url;
+            if (strpos($img_url, '/wp-content/uploads/') === 0) $img_url = 'https://borkena.com' . $img_url;
             if (strpos($img_url, 'https://borkena.com/wp-content/uploads/') === 0) {
-                // Remove duplicate slashes (except after https:)
                 $img_url = preg_replace('#(?<!:)//+#', '/', $img_url);
-                $images[] = $img_url;
+                if (!in_array($img_url, $images)) { // Avoid duplicates
+                    $images[] = $img_url;
+                }
             }
         }
     } else {
@@ -342,6 +385,23 @@ function get_borkena_article_images($article_url) {
     }
     echo "</ul>";
     return $images;
+}
+
+// Add this function at the top level
+function extract_published_date($xpath) {
+    $published_at = null;
+    $timeNode = $xpath->query('//time')->item(0);
+    if ($timeNode) {
+        $published_at = $timeNode->getAttribute('datetime') ?: $timeNode->textContent;
+        $published_at = date('Y-m-d H:i:s', strtotime($published_at));
+    } else {
+        $metaDate = $xpath->query('//meta[@property="article:published_time"]')->item(0);
+        if ($metaDate) {
+            $published_at = $metaDate->getAttribute('content');
+            $published_at = date('Y-m-d H:i:s', strtotime($published_at));
+        }
+    }
+    return $published_at;
 }
 
 // Example usage:
@@ -357,20 +417,7 @@ if (empty($found_images)) {
     }
 }
 
-if (!empty($found_images)) {
-    $inserted = 0;
-    $stmt = $conn->prepare("INSERT INTO borkena_images (article_url, image_url) VALUES (?, ?)");
-    foreach ($found_images as $img_url) {
-        if (empty($img_url) || !filter_var($img_url, FILTER_VALIDATE_URL)) continue; // Skip empty or invalid URLs
-        echo "<!-- Inserting image URL: $img_url -->\n";
-        $stmt->bind_param("ss", $test_url, $img_url);
-        if ($stmt->execute()) {
-            $inserted++;
-        }
-    }
-    $stmt->close();
-    echo "<p style='color:green;'>Saved $inserted image URLs to the database.</p>";
-}
+// Remove all borkena_images insert logic
 
 // MAIN EXECUTION
 $start = microtime(true);
