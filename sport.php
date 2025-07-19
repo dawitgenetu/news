@@ -3,9 +3,9 @@ $page_title = 'Sport';
 require_once 'includes/header.php';
 require_once 'includes/article_functions.php';
 
-// Get articles for the sport category
+// Get articles for the sport category (case-insensitive)
 $article = new Article($conn);
-$articles = $article->getByCategory('Sports');
+$articles = $article->getByCategory('sport');
 $trendingArticles = $article->getTrending(2);
 ?>
 

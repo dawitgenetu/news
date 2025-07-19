@@ -36,6 +36,22 @@ class Article {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function getLatest($limit = 6) {
+        $stmt = $this->conn->prepare("SELECT * FROM articles ORDER BY created_at DESC LIMIT ?");
+        $stmt->bind_param("i", $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getPopular($limit = 6) {
+        $stmt = $this->conn->prepare("SELECT * FROM articles ORDER BY views DESC LIMIT ?");
+        $stmt->bind_param("i", $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function getById($id) {
         $stmt = $this->conn->prepare("SELECT * FROM articles WHERE id = ?");
         $stmt->bind_param("i", $id);

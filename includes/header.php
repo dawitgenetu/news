@@ -131,35 +131,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Breaking News Bar -->
-    <div class="gradient-bg text-white py-3 relative overflow-hidden">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <span class="font-bold text-sm bg-white text-red-700 px-3 py-1 rounded-full animate-pulse">
-                        BREAKING
-                    </span>
-                    <div class="overflow-hidden flex-1">
-                        <div class="marquee whitespace-nowrap text-sm">
-                            🚨 Latest updates from Ethiopia and around the world. Stay informed with Borkena News. 
-                            📰 Breaking: Major developments in regional politics. 
-                            🌍 International news and analysis. 
-                            📊 Economic updates and market insights.
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="#" class="hover:text-gray-200 transition-colors hover:scale-110 transform duration-200">
-                        <i class="fa-solid fa-rss"></i>
-                    </a>
-                    <button id="theme-toggle" class="hover:text-gray-200 transition-colors hover:scale-110 transform duration-200">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Top Bar -->
     <div class="bg-gray-800 text-white py-2">
         <div class="container mx-auto px-4">
@@ -195,14 +166,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <!-- Logo and Search -->
             <div class="py-6 flex items-center justify-between">
                 <a href="index.php" class="flex items-center space-x-3 hover-lift">
-                    <div class="relative">
-                        <i class="fa-solid fa-newspaper text-4xl text-red-700"></i>
-                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    </div>
-                    <div>
-                        <span class="text-3xl font-bold text-red-700 font-['Poppins']">Borkena</span>
-                        <span class="text-xl font-medium text-gray-600 block -mt-1">News</span>
-                    </div>
+                    <img src="images/borkena-logo.png" alt="Borkena News Logo" style="height: 70px;">
                 </a>
                 
                 <div class="hidden lg:flex items-center space-x-4 flex-1 max-w-2xl mx-8">

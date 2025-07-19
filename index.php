@@ -5,8 +5,10 @@ require_once 'includes/article_functions.php';
 
 // Get featured and trending articles
 $article = new Article($conn);
-$featuredArticles = $article->getFeatured(3);
+$featuredArticles = $article->getFeatured(6); // Show more featured
 $trendingArticles = $article->getTrending(5);
+$latestArticles = $article->getLatest(6); // New method for latest
+$popularArticles = $article->getPopular(6); // New method for popular
 $latestNews = $article->getByCategory('news', 6);
 $latestPolitics = $article->getByCategory('politics', 3);
 $latestBusiness = $article->getByCategory('business', 3);
@@ -47,39 +49,75 @@ $latestBusiness = $article->getByCategory('business', 3);
     </div>
 </div>
 
+<!-- Latest Articles Section -->
+<section class="container mx-auto px-4 mb-12">
+    <h2 class="text-3xl font-bold mb-6">Latest Articles</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <?php foreach ($latestArticles as $article) { ?>
+            <a href="article.php?id=<?php echo $article['id']; ?>" class="group">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
+                    <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                            <?php echo htmlspecialchars($article['title']); ?>
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <?php echo htmlspecialchars(substr($article['content'], 0, 120)) . '...'; ?>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        <?php } ?>
+    </div>
+</section>
+
+<!-- Featured Articles Section -->
+<section class="container mx-auto px-4 mb-12">
+    <h2 class="text-3xl font-bold mb-6">Featured Articles</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <?php foreach ($featuredArticles as $article) { ?>
+            <a href="article.php?id=<?php echo $article['id']; ?>" class="group">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
+                    <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                            <?php echo htmlspecialchars($article['title']); ?>
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <?php echo htmlspecialchars(substr($article['content'], 0, 120)) . '...'; ?>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        <?php } ?>
+    </div>
+</section>
+
+<!-- Popular Articles Section -->
+<section class="container mx-auto px-4 mb-12">
+    <h2 class="text-3xl font-bold mb-6">Popular Articles</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <?php foreach ($popularArticles as $article) { ?>
+            <a href="article.php?id=<?php echo $article['id']; ?>" class="group">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
+                    <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
+                            <?php echo htmlspecialchars($article['title']); ?>
+                        </h3>
+                        <p class="text-gray-600 mb-4">
+                            <?php echo htmlspecialchars(substr($article['content'], 0, 120)) . '...'; ?>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        <?php } ?>
+    </div>
+</section>
+
 <div class="container mx-auto px-4 mb-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
     <!-- Main Content -->
     <div class="lg:col-span-3 space-y-12">
-        <!-- Latest News -->
-        <section>
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">Latest News</h2>
-                <a href="news.php" class="text-red-700 hover:text-red-800 font-medium">View All</a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <?php foreach ($latestNews as $article) { ?>
-                    <a href="article.php?id=<?php echo $article['id']; ?>" class="group">
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow relative">
-                            <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                            <div class="absolute top-4 left-4 bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow">News</div>
-                            <div class="p-6">
-                                <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700 transition-colors">
-                                    <?php echo htmlspecialchars($article['title']); ?>
-                                </h3>
-                                <p class="text-gray-600 mb-4">
-                                    <?php echo htmlspecialchars(substr($article['content'], 0, 120)) . '...'; ?>
-                                </p>
-                                <div class="flex justify-between items-center text-sm text-gray-500">
-                                    <span><?php echo date('M d, Y', strtotime($article['created_at'])); ?></span>
-                                    <span><?php echo $article['views']; ?> views</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                <?php } ?>
-            </div>
-        </section>
-
         <!-- All Categories Section -->
         <section class="mt-16">
             <h2 class="text-3xl font-bold mb-8">Browse by Category</h2>
@@ -128,86 +166,11 @@ $latestBusiness = $article->getByCategory('business', 3);
         </section>
 
         <!-- Politics and Business Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Politics -->
-            <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Politics</h2>
-                    <a href="politics.php" class="text-red-700 hover:text-red-800 font-medium">View All</a>
-                </div>
-                <div class="space-y-6">
-                    <?php foreach ($latestPolitics as $article) { ?>
-                        <a href="article.php?id=<?php echo $article['id']; ?>" class="group block">
-                            <div class="flex gap-4 items-center bg-white rounded-lg shadow hover:shadow-xl transition p-4">
-                                <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-24 h-20 object-cover rounded-lg">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-red-700 mb-2">
-                                        <?php echo htmlspecialchars($article['title']); ?>
-                                    </h3>
-                                    <p class="text-sm text-gray-500">
-                                        <?php echo date('M d, Y', strtotime($article['created_at'])); ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    <?php } ?>
-                </div>
-            </div>
-            <!-- Business -->
-            <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Business</h2>
-                    <a href="business.php" class="text-red-700 hover:text-red-800 font-medium">View All</a>
-                </div>
-                <div class="space-y-6">
-                    <?php foreach ($latestBusiness as $article) { ?>
-                        <a href="article.php?id=<?php echo $article['id']; ?>" class="group block">
-                            <div class="flex gap-4 items-center bg-white rounded-lg shadow hover:shadow-xl transition p-4">
-                                <img src="<?php echo htmlspecialchars($article['image_url']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="w-24 h-20 object-cover rounded-lg">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-red-700 mb-2">
-                                        <?php echo htmlspecialchars($article['title']); ?>
-                                    </h3>
-                                    <p class="text-sm text-gray-500">
-                                        <?php echo date('M d, Y', strtotime($article['created_at'])); ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    <?php } ?>
-                </div>
-            </div>
-        </section>
+        <!-- Removed as per user request -->
+
+        <!-- Sidebar -->
+        <!-- Removed Trending Now and Newsletter sections as per user request -->
     </div>
-    <!-- Sidebar -->
-    <aside class="space-y-10 lg:sticky lg:top-24">
-        <!-- Trending Now -->
-        <section class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-xl font-bold mb-4 text-red-700 flex items-center"><i class="fa-solid fa-fire mr-2"></i>Trending Now</h3>
-            <ul class="space-y-4">
-                <?php foreach ($trendingArticles as $ta) { ?>
-                    <li>
-                        <a href="article.php?id=<?php echo $ta['id']; ?>" class="flex items-center gap-3 group">
-                            <img src="<?php echo htmlspecialchars($ta['image_url']); ?>" alt="<?php echo htmlspecialchars($ta['title']); ?>" class="w-14 h-14 object-cover rounded-lg">
-                            <div>
-                                <h4 class="text-base font-semibold text-gray-900 group-hover:text-red-700 transition-colors"><?php echo htmlspecialchars($ta['title']); ?></h4>
-                                <span class="text-xs text-gray-500"><?php echo date('M d, Y', strtotime($ta['created_at'])); ?></span>
-                            </div>
-                        </a>
-                    </li>
-                <?php } ?>
-            </ul>
-        </section>
-        <!-- Newsletter Signup -->
-        <section class="bg-gradient-to-br from-red-600 to-red-400 rounded-xl shadow-lg p-6 text-white">
-            <h3 class="text-xl font-bold mb-2"><i class="fa-solid fa-envelope mr-2"></i>Newsletter</h3>
-            <p class="mb-4 text-sm">Get the latest news delivered to your inbox. Subscribe to our newsletter!</p>
-            <form action="#" method="POST" class="space-y-3">
-                <input type="email" name="email" placeholder="Your email address" class="w-full px-4 py-2 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-300">
-                <button type="submit" class="w-full bg-white text-red-700 font-bold py-2 rounded-lg hover:bg-gray-100 transition">Subscribe</button>
-            </form>
-        </section>
-    </aside>
 </div>
 
 <!-- SwiperJS for Hero Carousel -->

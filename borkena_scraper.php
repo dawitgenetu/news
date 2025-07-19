@@ -1,83 +1,83 @@
 <?php
-set_time_limit(600); // Allow up to 10 minutes for script execution
-// borkena_scraper.php
-// Scrapes news articles from https://borkena.com/ for all categories and saves directly to the database
+// borkena_scraper.php - Scrape news from borkena.com and upload to MySQL database
+set_time_limit(600);
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db_config.php';
 
-// CONFIGURATION
+// Ensure borkena_images table exists
+$conn->query("CREATE TABLE IF NOT EXISTS borkena_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    article_url VARCHAR(512),
+    image_url VARCHAR(512),
+    scraped_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+// --- CONFIG ---
 $baseUrl = 'https://borkena.com/';
 $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-$logFile = 'borkena_scraper.log';
+$logFile = __DIR__ . '/borkena_scraper.log';
 
-// Database config
-$dbHost = 'localhost';
-$dbName = 'reporter';
-$dbUser = 'root';
-$dbPass = '';
-
-// Updated category pages with proper URLs
 $categoryPages = [
-    'news' => 'https://borkena.com/category/news/',
+    'news' => 'https://borkena.com/ethiopia-news/',
+    'business' => 'https://borkena.com/ethiopia-business-news/',
+    'opinion' => 'https://borkena.com/ethiopian-news-and-opinion/',
+    'entertainment' => 'https://borkena.com/entertainment-ethiopian-music-drama-show/',
     'politics' => 'https://borkena.com/category/politics/',
-    'business' => 'https://borkena.com/category/business/',
     'sport' => 'https://borkena.com/category/sport/',
-    'opinion' => 'https://borkena.com/category/opinion/',
     'video' => 'https://borkena.com/category/video/',
-    'entertainment' => 'https://borkena.com/category/entertainment/',
-    'society' => 'https://borkena.com/category/society/',
-    'technology' => 'https://borkena.com/category/technology/',
-    'health' => 'https://borkena.com/category/health/',
-    'education' => 'https://borkena.com/category/education/',
-    'international' => 'https://borkena.com/category/international/'
+    // The following categories were removed due to broken or inaccessible URLs:
+    // 'society' => 'https://borkena.com/category/society/',
+    // 'technology' => 'https://borkena.com/category/technology/',
+    // 'health' => 'https://borkena.com/category/health/',
+    // 'education' => 'https://borkena.com/category/education/',
+    // 'international' => 'https://borkena.com/category/international/'
 ];
 
-// Helper: Log messages
 function logMessage($msg) {
     global $logFile;
     file_put_contents($logFile, date('[Y-m-d H:i:s] ') . $msg . "\n", FILE_APPEND);
 }
 
-// Helper: Fetch a URL using cURL
 function fetchUrl($url, $userAgent) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Lower timeout to 10 seconds
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    // Add more headers to mimic a real browser
+    $headers = [
         'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language: en-US,en;q=0.5',
-        'Accept-Encoding: gzip, deflate',
+        'Accept-Language: en-US,en;q=0.9',
         'Connection: keep-alive',
-        'Upgrade-Insecure-Requests: 1'
-    ]);
+        'Cache-Control: max-age=0',
+        'Upgrade-Insecure-Requests: 1',
+        'Referer: https://borkena.com/'
+    ];
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     $html = curl_exec($ch);
     if (curl_errno($ch)) {
-        logMessage('cURL error: ' . curl_error($ch));
+        logMessage('cURL error: ' . curl_error($ch) . ' for URL: ' . $url);
+        curl_close($ch);
         return false;
     }
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
     if ($httpCode !== 200) {
         logMessage("HTTP error $httpCode for URL: $url");
         return false;
     }
-    
+    logMessage('Fetched HTML (first 500 chars): ' . substr($html, 0, 500));
     return $html;
 }
 
-// Helper: Clean text
 function cleanText($text) {
     return trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags($text))));
 }
 
-// Helper: Parse and validate article date
 function parseArticleDate($dateString) {
-    if (empty($dateString)) {
-        return null;
-    }
+    if (empty($dateString)) return null;
     $dateString = trim($dateString);
     $dateFormats = [
         'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d',
@@ -102,120 +102,8 @@ function parseArticleDate($dateString) {
     return null;
 }
 
-// Helper: Extract full article content
-function fetchArticleContent($url, $userAgent) {
-    $html = fetchUrl($url, $userAgent);
-    if (!$html) {
-        logMessage("Failed to fetch article URL: $url");
-        return '';
-    }
-    $doc = new DOMDocument();
-    @$doc->loadHTML($html);
-    $xpath = new DOMXPath($doc);
-    $contentSelectors = [
-        "//div[contains(@class, 'td-post-content')]//p",
-        "//div[contains(@class, 'entry-content')]//p",
-        "//article//div[contains(@class, 'content')]//p",
-        "//div[contains(@class, 'post-content')]//p",
-        "//div[@class='td-post-content']//p",
-        "//div[contains(@class, 'article-content')]//p",
-        "//div[contains(@class, 'post-body')]//p"
-    ];
-    $content = '';
-    foreach ($contentSelectors as $selector) {
-        $contentNodes = $xpath->query($selector);
-        if ($contentNodes->length > 0) {
-            foreach ($contentNodes as $p) {
-                $text = cleanText($p->textContent);
-                // Filter out paragraphs containing 'borkena subscribe' or 'editor\'s note'
-                if (stripos($text, 'borkena subscribe') !== false) continue;
-                if (stripos($text, "editor's note") !== false) continue;
-                if (strlen($text) > 20) {
-                    $content .= $text . "\n\n";
-                }
-            }
-            break;
-        }
-    }
-    return trim($content);
-}
-
-// Helper: Extract image URL with multiple fallback methods
-function extractImageUrl($node, $xpath) {
-    $image = '';
-    // Priority: <img> with class containing 'wp-image-'
-    $imgNodes = $xpath->query('.//img[contains(@class, "wp-image-")]', $node);
-    if ($imgNodes->length > 0) {
-        $imgNode = $imgNodes->item(0);
-        $image = $imgNode->getAttribute('src');
-        if (!$image) {
-            $image = $imgNode->getAttribute('data-src');
-        }
-        if ($image) return $image;
-    }
-    // Fallback to previous logic
-    $thumbDiv = $xpath->query(".//div[contains(@class, 'td-module-thumb')]", $node)->item(0);
-    if ($thumbDiv) {
-        $dataImgUrl = $thumbDiv->getAttribute('data-img-url');
-        if ($dataImgUrl) {
-            $image = $dataImgUrl;
-        } else {
-            $imgNode = $xpath->query('.//img', $thumbDiv)->item(0);
-            if ($imgNode) {
-                $image = $imgNode->getAttribute('src');
-                if (!$image) {
-                    $image = $imgNode->getAttribute('data-src');
-                }
-            }
-            if (!$image) {
-                $spanNodes = $xpath->query('.//span[contains(@class, "entry-thumb")]', $thumbDiv);
-                foreach ($spanNodes as $span) {
-                    $style = $span->getAttribute('style');
-                    if (preg_match('/background-image:\\s*url\\([\"\']?([^\"\']+)[\"\']?\\)/i', $style, $matches)) {
-                        $image = $matches[1];
-                        break;
-                    }
-                }
-            }
-            if (!$image) {
-                $style = $thumbDiv->getAttribute('style');
-                if (preg_match('/background-image:\\s*url\\([\"\']?([^\"\']+)[\"\']?\\)/i', $style, $matches)) {
-                    $image = $matches[1];
-                }
-            }
-            if (!$image) {
-                $noscript = $xpath->query('.//noscript', $thumbDiv)->item(0);
-                if ($noscript) {
-                    if (preg_match('/<img[^>]+src=[\"\']([^\"\']+)[\"\']/i', $noscript->nodeValue, $matches)) {
-                        $image = $matches[1];
-                    }
-                }
-            }
-        }
-    }
-    if (!$image) {
-        $imgNode = $xpath->query('.//img', $node)->item(0);
-        if ($imgNode) {
-            $image = $imgNode->getAttribute('src');
-            if (!$image) {
-                $image = $imgNode->getAttribute('data-src');
-            }
-        }
-    }
-    return $image;
-}
-
-// Database connection
-try {
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4", $dbUser, $dbPass);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-// Helper: Get or create category
-function getCategoryId($db, $categoryName) {
-    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', $categoryName));
+function getOrCreateCategoryId($db, $categoryName) {
+    $slug = generate_slug($categoryName);
     $stmt = $db->prepare("SELECT id FROM categories WHERE name = ? OR slug = ?");
     $stmt->execute([$categoryName, $slug]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -227,10 +115,88 @@ function getCategoryId($db, $categoryName) {
     return $db->lastInsertId();
 }
 
-// Main scraping function for a given category page
+function fetchArticleContent($url, $userAgent) {
+    $html = fetchUrl($url, $userAgent);
+    if (!$html) {
+        logMessage("Failed to fetch article URL: $url");
+        return '';
+    }
+    $doc = new DOMDocument();
+    @$doc->loadHTML($html);
+    $xpath = new DOMXPath($doc);
+    $contentNode = $xpath->query("//div[contains(@class, 'tdb_single_content')]")->item(0);
+    if (!$contentNode) {
+        logMessage("No main content found for $url");
+        return '';
+    }
+    $content = '';
+    foreach ($xpath->query(".//p|.//h2|.//ul|.//ol", $contentNode) as $node) {
+        $text = trim($node->textContent);
+        if (stripos($text, 'borkena subscribe') !== false) continue;
+        if (stripos($text, "editor's note") !== false) continue;
+        if (strlen($text) > 20) {
+            $content .= $text . "\n\n";
+        }
+    }
+    return trim($content);
+}
+
+function extractImageUrl($node, $xpath, $articleUrl = null, $userAgent = null) {
+    // Log the HTML of the node being checked
+    if ($node instanceof DOMNode) {
+        $tmpDoc = new DOMDocument();
+        $tmpDoc->appendChild($tmpDoc->importNode($node, true));
+        logMessage("extractImageUrl node HTML: " . $tmpDoc->saveHTML());
+    }
+    // Find any <img> with class containing 'wp-image-' and 'lazyloaded'
+    $imgNode = $xpath->query('.//img[contains(@class, "wp-image-") and contains(@class, "lazyloaded")]', $node)->item(0);
+    if ($imgNode) {
+        $image = $imgNode->getAttribute('src');
+        if (!$image) {
+            $image = $imgNode->getAttribute('data-src');
+        }
+        logMessage("extractImageUrl: Found <img> with class 'wp-image-* lazyloaded', src: $image");
+        if ($image) {
+            return $image;
+        }
+    }
+    // Fallback: any <img>
+    $imgNode = $xpath->query('.//img', $node)->item(0);
+    if ($imgNode) {
+        $image = $imgNode->getAttribute('src');
+        if (!$image) {
+            $image = $imgNode->getAttribute('data-src');
+        }
+        logMessage("extractImageUrl: Fallback <img>, src: $image");
+        if ($image) {
+            return $image;
+        }
+    }
+    logMessage("extractImageUrl: No image found in node.");
+    return '';
+}
+
+function downloadImage($imageUrl, $uploadDir) {
+    $imageData = @file_get_contents($imageUrl);
+    if ($imageData === false) {
+        logMessage('Failed to download image: ' . $imageUrl);
+        return '';
+    }
+    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+    if (!$ext) $ext = 'jpg';
+    $filename = uniqid('img_') . '.' . $ext;
+    $filePath = $uploadDir . $filename;
+    if (file_put_contents($filePath, $imageData)) {
+        // Return relative path for use in HTML
+        return 'uploads/images/' . $filename;
+    } else {
+        logMessage('Failed to save image: ' . $filePath);
+        return '';
+    }
+}
+
 function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
     echo "\n=== Scraping category: $categoryName ===\n";
-    echo "URL: $categoryUrl\n";
     $html = fetchUrl($categoryUrl, $userAgent);
     if (!$html) {
         echo "Failed to fetch category page: $categoryName\n";
@@ -240,119 +206,19 @@ function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
     $doc = new DOMDocument();
     @$doc->loadHTML($html);
     $xpath = new DOMXPath($doc);
-    $articleSelectors = [
-        "//div[contains(@class, 'td_module_')]",
-        "//article[contains(@class, 'post')]",
-        "//div[contains(@class, 'post-item')]",
-        "//div[contains(@class, 'article-item')]",
-        "//div[@class='td-block-span6']",
-        "//div[contains(@class, 'td-block-span')]",
-        "//article",
-        "//div[contains(@class, 'entry')]",
-        "//div[contains(@class, 'post')]",
-        "//div[contains(@class, 'item')]"
-    ];
-    $articleNodes = null;
-    foreach ($articleSelectors as $selector) {
-        $articleNodes = $xpath->query($selector);
-        if ($articleNodes->length > 0) {
-            echo "Found " . $articleNodes->length . " articles using selector: $selector\n";
-            break;
-        }
-    }
-    if (!$articleNodes || $articleNodes->length === 0) {
+    $articleNodes = $xpath->query("//div[contains(@class, 'td_module_')]//h3/a");
+    if ($articleNodes->length === 0) {
         echo "Warning: No article nodes found in $categoryName.\n";
         logMessage("No article nodes found in $categoryName.");
         return 0;
     }
     $count = 0;
-    $maxArticles = 15;
-    foreach ($articleNodes as $node) {
+    $maxArticles = 10;
+    foreach ($articleNodes as $titleNode) {
         if ($count >= $maxArticles) break;
-        // Title and URL extraction
-        $titleSelectors = [
-            ".//h3/a", ".//h2/a", ".//h1/a",
-            ".//a[contains(@class, 'title')]",
-            ".//a[contains(@class, 'entry-title')]",
-            ".//a[contains(@class, 'post-title')]",
-            ".//a[contains(@class, 'article-title')]",
-            ".//a[contains(@class, 'link')]",
-            ".//a[contains(@href, '/20')]",
-            ".//a"
-        ];
-        $titleNode = null;
-        foreach ($titleSelectors as $selector) {
-            $titleNodes = $xpath->query($selector, $node);
-            foreach ($titleNodes as $tn) {
-                $href = $tn->getAttribute('href');
-                $text = cleanText($tn->textContent);
-                if ($href && $text && strpos($href, '/20') !== false && strlen($text) > 10 && strpos($href, 'borkena.com') !== false) {
-                    $titleNode = $tn;
-                    break 2;
-                }
-            }
-        }
-        if (!$titleNode) {
-            echo "Skipping article - no valid title found\n";
-            continue;
-        }
         $title = cleanText($titleNode->textContent);
         $url = $titleNode->getAttribute('href');
-        if (empty($title) || empty($url)) {
-            echo "Skipping article - empty title or URL\n";
-            continue;
-        }
-        if (strpos($url, '/20') === false || strpos($url, 'borkena.com') === false) {
-            echo "Skipping article - invalid URL: $url\n";
-            continue;
-        }
-        // Extract image
-        $image = extractImageUrl($node, $xpath);
-        // Extract excerpt/summary
-        $excerptSelectors = [
-            ".//div[contains(@class, 'td-excerpt')]",
-            ".//div[contains(@class, 'entry-summary')]",
-            ".//p[contains(@class, 'excerpt')]",
-            ".//div[contains(@class, 'td-module-meta-info')]/p",
-            ".//div[contains(@class, 'summary')]",
-            ".//p[contains(@class, 'description')]"
-        ];
-        $excerpt = '';
-        foreach ($excerptSelectors as $selector) {
-            $excerptNode = $xpath->query($selector, $node)->item(0);
-            if ($excerptNode) {
-                $excerpt = cleanText($excerptNode->textContent);
-                break;
-            }
-        }
-        // Extract date
-        $dateSelectors = [
-            ".//time",
-            ".//span[contains(@class, 'date')]",
-            ".//div[contains(@class, 'date')]",
-            ".//time[@datetime]",
-            ".//span[contains(@class, 'time')]",
-            ".//div[contains(@class, 'meta')]//span"
-        ];
-        $date = '';
-        foreach ($dateSelectors as $selector) {
-            $dateNode = $xpath->query($selector, $node)->item(0);
-            if ($dateNode) {
-                $date = cleanText($dateNode->textContent);
-                if (!$date) {
-                    $date = $dateNode->getAttribute('datetime');
-                }
-                break;
-            }
-        }
-        $parsedDate = parseArticleDate($date);
-        // Fetch full article content
-        echo "Fetching content for: $title\n";
-        $content = fetchArticleContent($url, $userAgent);
-        if (!$content) {
-            echo "Warning: No content found for $url\n";
-            logMessage("No content found for $url");
-        }
+        if (empty($title) || empty($url)) continue;
         // Check for duplicate by URL
         $stmt = $db->prepare("SELECT id FROM articles WHERE url = ?");
         $stmt->execute([$url]);
@@ -360,44 +226,156 @@ function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
             echo "Skipping duplicate: $title (URL already exists)\n";
             continue;
         }
+        // Extract image (improved)
+        $image = extractImageUrl($titleNode->parentNode->parentNode, $xpath, $url, $userAgent);
+        // Download image and get local path
+        $localImagePath = '';
+        if ($image) {
+            $localImagePath = downloadImage($image, __DIR__ . '/uploads/images/');
+        }
+        // Fetch full article content
+        echo "Fetching content for: $title\n";
+        $content = fetchArticleContent($url, $userAgent);
+        if (!$content) {
+            echo "Warning: No content found for $url\n";
+            logMessage("No content found for $url");
+        }
+        // Excerpt
+        $excerpt = get_excerpt($content, 200);
+        // Date (try to extract from article page)
+        $published_at = null;
+        $articleHtml = fetchUrl($url, $userAgent);
+        if ($articleHtml) {
+            $adoc = new DOMDocument();
+            @$adoc->loadHTML($articleHtml);
+            $axp = new DOMXPath($adoc);
+            $dateNode = $axp->query("//time")->item(0);
+            if ($dateNode) {
+                $published_at = parseArticleDate($dateNode->getAttribute('datetime') ?: $dateNode->textContent);
+            }
+        }
+        if (!$published_at) $published_at = date('Y-m-d H:i:s');
         // Get or create category
-        $categoryId = getCategoryId($db, ucfirst($categoryName));
+        $categoryId = getOrCreateCategoryId($db, ucfirst($categoryName));
         // Insert article
         try {
-            $stmt = $db->prepare("
-                INSERT INTO articles (
-                    title, slug, content, excerpt, image_url, category_id, 
-                    published_at, status, url
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'published', ?)
-            ");
-            $slug = strtolower(trim(preg_replace('/[^a-z0-9\s-]/', '', $title)));
-            $slug = preg_replace('/[\s-]+/', '-', $slug);
-            $slug = trim($slug, '-');
-            if (strlen($slug) > 200) {
-                $slug = substr($slug, 0, 200);
-                $slug = rtrim($slug, '-');
-            }
-            $stmt->execute([
-                $title, $slug, $content, $excerpt, $image, $categoryId, $parsedDate, $url
-            ]);
+            $slug = generate_slug($title);
+            $stmt = $db->prepare("INSERT INTO articles (title, slug, content, excerpt, image_url, url, category_id, status, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'published', ?)");
+            $stmt->execute([$title, $slug, $content, $excerpt, $localImagePath, $url, $categoryId, $published_at]);
             echo "Inserted: $title (Category: $categoryName)\n";
             $count++;
         } catch (Exception $e) {
             echo "Error inserting '$title': " . $e->getMessage() . "\n";
             logMessage("Error inserting '$title': " . $e->getMessage());
         }
-        sleep(2); // Be respectful to the server
+        sleep(2);
     }
     echo "Completed scraping $categoryName: $count articles inserted\n";
     return $count;
 }
 
+/**
+ * Scrape all image URLs from a borkena.com article page.
+ * Handles absolute/relative URLs, src/data-src, and only collects /wp-content/uploads/ images.
+ * Usage: php borkena_scraper.php or run in browser.
+ */
+
+function get_borkena_article_images($article_url) {
+    // Try file_get_contents first
+    $html = @file_get_contents($article_url);
+    if ($html === false) {
+        // Fallback to cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $article_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; BorkenaScraper/1.0)');
+        $html = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($html === false || $http_code !== 200) {
+            echo "<p style='color:red;'>Failed to fetch article HTML from: $article_url (HTTP code: $http_code)</p>";
+            return [];
+        }
+    }
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML($html);
+    libxml_clear_errors();
+
+    $images = [];
+    echo "<h3>Debug: All <img> tags found in the HTML</h3>";
+    echo "<ul style='font-size:13px;'>";
+    $xpath = new DOMXPath($dom);
+    $contentNode = $xpath->query("//div[contains(@class, 'tdb_single_content')]")->item(0);
+    if ($contentNode) {
+        foreach ($contentNode->getElementsByTagName('img') as $img) {
+            $src = html_entity_decode(trim($img->getAttribute('src')));
+            $data_src = html_entity_decode(trim($img->getAttribute('data-src')));
+            $data_lazy_src = html_entity_decode(trim($img->getAttribute('data-lazy-src')));
+            $data_original = html_entity_decode(trim($img->getAttribute('data-original')));
+            $data_srcset = html_entity_decode(trim($img->getAttribute('data-srcset')));
+            echo "<li>src: <code>" . htmlspecialchars($src) . "</code> | data-src: <code>" . htmlspecialchars($data_src) . "</code> | data-lazy-src: <code>" . htmlspecialchars($data_lazy_src) . "</code> | data-original: <code>" . htmlspecialchars($data_original) . "</code> | data-srcset: <code>" . htmlspecialchars($data_srcset) . "</code></li>";
+
+            // Prefer src, then data-src, then data-lazy-src, then data-original, then data-srcset
+            $img_url = $src ?: $data_src ?: $data_lazy_src ?: $data_original ?: $data_srcset;
+
+            // Normalize protocol-relative URLs
+            if (strpos($img_url, '//borkena.com/wp-content/uploads/') === 0) {
+                $img_url = 'https:' . $img_url;
+            }
+
+            // Normalize relative URLs
+            if (strpos($img_url, '/wp-content/uploads/') === 0) {
+                $img_url = 'https://borkena.com' . $img_url;
+            }
+
+            // Only accept images from borkena.com uploads
+            if (strpos($img_url, 'https://borkena.com/wp-content/uploads/') === 0) {
+                // Remove duplicate slashes (except after https:)
+                $img_url = preg_replace('#(?<!:)//+#', '/', $img_url);
+                $images[] = $img_url;
+            }
+        }
+    } else {
+        echo "<li style='color:red;'>No .tdb_single_content node found in article HTML.</li>";
+    }
+    echo "</ul>";
+    return $images;
+}
+
+// Example usage:
+$test_url = isset($_GET['url']) ? $_GET['url'] : 'https://borkena.com/2024/12/01/ethiopia-news-headline/'; // Use a real article URL
+$found_images = get_borkena_article_images($test_url);
+
+if (empty($found_images)) {
+    echo "<p>No images found in the article.</p>";
+} else {
+    echo "<h2>Images found in the article:</h2>";
+    foreach ($found_images as $url) {
+        echo "<div style='display:inline-block;margin:10px;'><img src='$url' style='max-width:300px;'><br><small>$url</small></div>";
+    }
+}
+
+if (!empty($found_images)) {
+    $inserted = 0;
+    $stmt = $conn->prepare("INSERT INTO borkena_images (article_url, image_url) VALUES (?, ?)");
+    foreach ($found_images as $img_url) {
+        if (empty($img_url) || !filter_var($img_url, FILTER_VALIDATE_URL)) continue; // Skip empty or invalid URLs
+        echo "<!-- Inserting image URL: $img_url -->\n";
+        $stmt->bind_param("ss", $test_url, $img_url);
+        if ($stmt->execute()) {
+            $inserted++;
+        }
+    }
+    $stmt->close();
+    echo "<p style='color:green;'>Saved $inserted image URLs to the database.</p>";
+}
+
 // MAIN EXECUTION
 $start = microtime(true);
-logMessage('Scraping started (direct to DB, no JSON).');
-
-echo "Starting Borkena News Scraper (direct to DB)\n";
-echo "=============================\n";
+logMessage('Scraping started.');
+echo "Starting Borkena News Scraper\n=============================\n";
 echo "Current date: " . date('Y-m-d') . "\n\n";
 
 $totalInserted = 0;
@@ -415,12 +393,8 @@ foreach ($categoryPages as $catName => $catUrl) {
 
 $end = microtime(true);
 $duration = round($end - $start, 2);
-
 logMessage('Scraping finished. Articles inserted: ' . $totalInserted . '. Time taken: ' . $duration . 's.');
-
-echo "\n========================================\n";
-echo "SCRAPING COMPLETE\n";
-echo "========================================\n";
+echo "\n========================================\nSCRAPING COMPLETE\n========================================\n";
 echo "Total articles inserted: $totalInserted\n";
 echo "Time taken: $duration seconds\n";
 echo "END OF SCRIPT\n";
