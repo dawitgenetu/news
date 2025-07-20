@@ -36,7 +36,7 @@ $relatedArticles = array_slice($relatedArticles, 0, 3);
 // SEO & Social Meta
 $metaTitle = htmlspecialchars($articleData['title']);
 $metaDescription = htmlspecialchars(mb_substr(strip_tags($articleData['content']), 0, 160));
-$metaImage = htmlspecialchars($articleData['image_url']);
+$metaImage = htmlspecialchars(!empty($articleData['local_image_path']) ? $articleData['local_image_path'] : $articleData['image_url']);
 $metaUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 ?>
 
@@ -55,108 +55,105 @@ $metaUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "
     <meta name="twitter:image" content="<?php echo $metaImage; ?>">
 </head>
 
-<main>
-    <!-- Article Header -->
-    <header class="bg-gray-900 text-white">
-        <div class="container mx-auto px-4 py-16">
-            <div class="max-w-4xl mx-auto">
-                <nav aria-label="Breadcrumb" class="mb-4">
-                    <ol class="flex items-center space-x-2 text-sm text-gray-300">
-                        <li><a href="index.php" class="hover:text-white">Home</a></li>
-                        <li><span aria-hidden="true">/</span></li>
-                        <li><a href="<?php echo isset($articleData['category']) && $articleData['category'] ? strtolower($articleData['category']) : 'news'; ?>.php" class="hover:text-white"><?php echo isset($articleData['category']) && $articleData['category'] ? ucfirst($articleData['category']) : 'News'; ?></a></li>
-                    </ol>
-                </nav>
-                <div class="flex items-center space-x-4 text-sm text-gray-300 mb-4">
-                    <span><?php echo date('F j, Y', strtotime($articleData['created_at'])); ?></span>
-                    <span>•</span>
-                    <span><?php echo $articleData['views']; ?> views</span>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-bold mb-6"><?php echo $metaTitle; ?></h1>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center" aria-hidden="true">
-                            <i class="fas fa-user text-xl"></i>
-                        </div>
-                        <div class="ml-3">
-                            <p class="font-medium"><?php echo isset($articleData['author']) && $articleData['author'] ? htmlspecialchars($articleData['author']) : 'Unknown Author'; ?></p>
-                            <p class="text-sm text-gray-300">Author</p>
-                        </div>
-                    </div>
-                </div>
+<main class="bg-white">
+    <div class="container mx-auto px-4 py-10">
+        <article class="max-w-3xl mx-auto">
+            <!-- Title & Info -->
+            <h1 class="text-4xl font-bold text-blue-700 leading-tight mb-4"><?php echo $metaTitle; ?></h1>
+            <div class="flex items-center text-sm text-gray-600 mb-6">
+                <span class="mr-4"><?php echo date('F j, Y', strtotime($articleData['published_at'])); ?></span>
+                <?php if (isset($articleData['author']) && $articleData['author']) { ?>
+                    <span class="italic">By <?php echo htmlspecialchars($articleData['author']); ?></span>
+                <?php } ?>
             </div>
-        </div>
-    </header>
 
-    <!-- Article Content -->
-    <article class="container mx-auto px-4 py-12" itemscope itemtype="https://schema.org/Article">
-        <div class="max-w-4xl mx-auto">
             <!-- Featured Image -->
-            <figure class="mb-8">
-                <img src="<?php echo $metaImage; ?>" alt="<?php echo $metaTitle; ?>" class="w-full h-[500px] object-cover rounded-lg shadow-lg" loading="lazy"/>
-            </figure>
+            <?php if (!empty($metaImage)) { ?>
+                <img src="<?php echo $metaImage; ?>" alt="<?php echo $metaTitle; ?>" class="w-full h-auto rounded-lg mb-8 shadow" loading="lazy">
+            <?php } ?>
 
-            <!-- Article Body -->
-            <section class="prose prose-lg max-w-none" itemprop="articleBody">
+            <!-- Article Content -->
+            <div class="prose max-w-none text-gray-800 text-2xl font-bold">
                 <?php echo nl2br(htmlspecialchars($articleData['content'])); ?>
-            </section>
+            </div>
 
             <!-- Social Share -->
-            <section class="mt-12 pt-8 border-t border-gray-200" aria-label="Share this article">
-                <h3 class="text-xl font-bold mb-4">Share this article</h3>
+            <div class="mt-12 border-t pt-6">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes text-blue-500"></i> Share this article
+                </h3>
                 <div class="flex space-x-4">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($metaUrl); ?>" target="_blank" rel="noopener" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" aria-label="Share on Facebook">
-                        <i class="fab fa-facebook-f mr-2"></i> Share
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($metaUrl); ?>" target="_blank" rel="noopener" aria-label="Share on Facebook"
+                        class="w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-700 text-white text-2xl shadow transition-colors">
+                        <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode($metaUrl); ?>&text=<?php echo urlencode($metaTitle); ?>" target="_blank" rel="noopener" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors" aria-label="Share on Twitter">
-                        <i class="fab fa-twitter mr-2"></i> Tweet
+                    <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode($metaUrl); ?>&text=<?php echo urlencode($metaTitle); ?>" target="_blank" rel="noopener" aria-label="Share on Twitter"
+                        class="w-14 h-14 flex items-center justify-center rounded-full bg-blue-400 hover:bg-blue-500 text-white text-2xl shadow transition-colors">
+                        <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?php echo urlencode($metaUrl); ?>&title=<?php echo urlencode($metaTitle); ?>" target="_blank" rel="noopener" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors" aria-label="Share on LinkedIn">
-                        <i class="fab fa-linkedin-in mr-2"></i> Share
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?php echo urlencode($metaUrl); ?>&title=<?php echo urlencode($metaTitle); ?>" target="_blank" rel="noopener" aria-label="Share on LinkedIn"
+                        class="w-14 h-14 flex items-center justify-center rounded-full bg-blue-800 hover:bg-blue-900 text-white text-2xl shadow transition-colors">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <button onclick="copyArticleLink()" class="w-14 h-14 flex items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400 text-gray-700 text-2xl shadow transition-colors" aria-label="Copy link">
+                        <i class="fa-solid fa-link"></i>
+                    </button>
+                </div>
+                <div id="copy-link-msg" class="mt-4 text-green-600 font-semibold text-center hidden">Link copied to clipboard!</div>
+                    </div>
+            <script>
+            function copyArticleLink() {
+                navigator.clipboard.writeText("<?php echo $metaUrl; ?>");
+                var msg = document.getElementById('copy-link-msg');
+                msg.classList.remove('hidden');
+                setTimeout(function() { msg.classList.add('hidden'); }, 2000);
+            }
+            </script>
+
+            <!-- Telegram CTA -->
+            <style>
+            @keyframes telegram-glow {
+              0% { box-shadow: 0 0 0 0 #3b82f6, 0 0 0 0 #60a5fa; }
+              70% { box-shadow: 0 0 20px 10px #3b82f6, 0 0 40px 20px #60a5fa; }
+              100% { box-shadow: 0 0 0 0 #3b82f6, 0 0 0 0 #60a5fa; }
+            }
+            </style>
+            <div class="mt-16 flex justify-center">
+                <div class="bg-gradient-to-br from-blue-400 via-blue-200 to-blue-100 rounded-3xl shadow-2xl px-10 py-12 flex flex-col items-center w-full max-w-xl animate-fade-in">
+                    <div class="mb-4 flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-500 shadow-lg">
+                            <i class="fab fa-telegram-plane text-3xl text-white"></i>
+                        </span>
+                        <h3 class="text-2xl font-extrabold text-blue-800 tracking-wide">Follow us on Telegram</h3>
+                    </div>
+                    <p class="text-blue-900 text-lg font-semibold mb-6 text-center max-w-md">Get the latest news, updates, and exclusive content directly on your phone. Join our Telegram channel and never miss a story!</p>
+                    <a href="https://t.me/borkenanews" target="_blank" rel="noopener" class="inline-flex items-center px-10 py-4 bg-blue-600 text-white rounded-full text-xl font-bold shadow-lg hover:bg-blue-700 transition-colors relative" style="animation: telegram-glow 2.5s infinite alternate;">
+                        <i class="fab fa-telegram-plane mr-4 text-2xl"></i> Join @borkenanews
                     </a>
                 </div>
-            </section>
+            </div>
+        </article>
 
-            <!-- Author Bio -->
-            <aside class="mt-12 p-6 bg-gray-50 rounded-lg" aria-label="Author bio">
-                <div class="flex items-center">
-                    <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center" aria-hidden="true">
-                        <i class="fas fa-user text-2xl text-white"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-xl font-bold"><?php echo isset($articleData['author']) && $articleData['author'] ? htmlspecialchars($articleData['author']) : 'Unknown Author'; ?></h3>
-                        <p class="text-gray-600">Staff Writer at Borkena News</p>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Related Articles -->
-            <section class="mt-16" aria-label="Related articles">
-                <h2 class="text-3xl font-bold mb-8">Related Articles</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Related Articles (outside main article card) -->
+        <div class="mt-20">
+            <h2 class="text-2xl font-bold mb-6">Related Articles</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <?php foreach ($relatedArticles as $related) { ?>
-                        <a href="article.php?id=<?php echo $related['id']; ?>" class="group" aria-label="Read article: <?php echo htmlspecialchars($related['title']); ?>">
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                                <img src="<?php echo htmlspecialchars($related['image_url']); ?>" alt="<?php echo htmlspecialchars($related['title']); ?>" class="w-full h-48 object-cover" loading="lazy"/>
-                                <div class="p-6">
-                                    <h3 class="text-xl font-semibold mb-2 text-gray-900 group-hover:text-red-700">
-                                        <?php echo htmlspecialchars($related['title']); ?>
-                                    </h3>
-                                    <p class="text-gray-600 mb-4">
-                                        <?php echo htmlspecialchars(mb_substr($related['content'], 0, 100)) . '...'; ?>
-                                    </p>
-                                    <div class="flex justify-between items-center text-sm text-gray-500">
-                                        <span><?php echo date('M d, Y', strtotime($related['created_at'])); ?></span>
+                    <a href="article.php?id=<?php echo $related['id']; ?>" class="block bg-white rounded-lg shadow hover:shadow-lg transition">
+                        <img src="<?php echo htmlspecialchars(!empty($related['local_image_path']) ? $related['local_image_path'] : $related['image_url']); ?>" alt="<?php echo htmlspecialchars($related['title']); ?>" class="w-full h-40 object-cover rounded-t-lg" loading="lazy">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($related['title']); ?></h3>
+                            <p class="text-lg font-bold text-gray-800 mb-2"><?php echo htmlspecialchars(mb_substr($related['content'], 0, 90)) . '...'; ?></p>
+                            <div class="text-xs text-gray-500 flex justify-between">
+                                        <span><?php echo date('M d, Y', strtotime($related['published_at'])); ?></span>
                                         <span><?php echo $related['views']; ?> views</span>
-                                    </div>
                                 </div>
                             </div>
                         </a>
                     <?php } ?>
                 </div>
-            </section>
         </div>
-    </article>
+    </div>
 </main>
 
 <?php require_once 'includes/footer.php'; ?> 

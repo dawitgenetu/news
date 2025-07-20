@@ -249,18 +249,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </li>
                     <li><a href="news.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-newspaper mr-2"></i>News</a></li>
-                    <li><a href="politics.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
-                        <i class="fa-solid fa-landmark mr-2"></i>Politics</a></li>
                     <li><a href="business.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-briefcase mr-2"></i>Business</a></li>
                     <li><a href="sport.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-futbol mr-2"></i>Sports</a></li>
                     <li><a href="opinion.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-comments mr-2"></i>Opinion</a></li>
-                    <li><a href="video.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
-                        <i class="fa-solid fa-video mr-2"></i>Video</a></li>
                     <li><a href="entertainment.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-film mr-2"></i>Entertainment</a></li>
+                    <li><a href="travel.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
+                        <i class="fa-solid fa-plane mr-2"></i>Travel</a></li>
+                    <li><a href="health.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
+                        <i class="fa-solid fa-notes-medical mr-2"></i>Health</a></li>
                     <li><a href="business-listings.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
                         <i class="fa-solid fa-building mr-2"></i>Business Listings</a></li>
                     <li><a href="contact.php" class="nav-link text-gray-700 hover:text-blue-700 font-medium py-2 flex items-center">
@@ -310,18 +310,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <i class="fa-solid fa-home mr-3 w-5"></i>Home</a></li>
                             <li><a href="news.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-newspaper mr-3 w-5"></i>News</a></li>
-                            <li><a href="politics.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
-                                <i class="fa-solid fa-landmark mr-3 w-5"></i>Politics</a></li>
                             <li><a href="business.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-briefcase mr-3 w-5"></i>Business</a></li>
                             <li><a href="sport.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-futbol mr-3 w-5"></i>Sports</a></li>
                             <li><a href="opinion.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-comments mr-3 w-5"></i>Opinion</a></li>
-                            <li><a href="video.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
-                                <i class="fa-solid fa-video mr-3 w-5"></i>Video</a></li>
                             <li><a href="entertainment.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-film mr-3 w-5"></i>Entertainment</a></li>
+                            <li><a href="travel.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
+                                <i class="fa-solid fa-plane mr-3 w-5"></i>Travel</a></li>
+                            <li><a href="health.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
+                                <i class="fa-solid fa-notes-medical mr-3 w-5"></i>Health</a></li>
                             <li><a href="business-listings.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">
                                 <i class="fa-solid fa-building mr-3 w-5"></i>Business Listings</a></li>
                             <li><a href="contact.php" class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors">

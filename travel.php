@@ -10,57 +10,19 @@ $articlesPerPage = 12; // 3 columns x 4 rows
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $articlesPerPage;
 
-// Get the category_ids for Travel and Entertainment
-$excludeCategoryIds = [];
-$catResult = $conn->query("SELECT id FROM categories WHERE name IN ('Travel', 'Entertainment')");
-while ($catRow = $catResult->fetch_assoc()) {
-    $excludeCategoryIds[] = $catRow['id'];
-}
+// Get total number of travel articles
+$stmtCount = $conn->prepare("SELECT COUNT(*) as count FROM articles WHERE category_id = (SELECT id FROM categories WHERE name = 'Travel' LIMIT 1)");
+$stmtCount->execute();
+$result = $stmtCount->get_result();
+$row = $result->fetch_assoc();
+$totalArticles = $row ? $row['count'] : 0;
+$totalPages = max(1, ceil($totalArticles / $articlesPerPage));
 
-if (count($excludeCategoryIds) === 2) {
-    // Exclude both Travel and Entertainment
-    $placeholders = implode(',', array_fill(0, count($excludeCategoryIds), '?'));
-    $types = str_repeat('i', count($excludeCategoryIds));
-    // Count
-    $query = "SELECT COUNT(*) as count FROM articles WHERE category_id NOT IN ($placeholders)";
-    $stmt = $conn->prepare($query);
-    $params = array_merge([$types], $excludeCategoryIds);
-    call_user_func_array([$stmt, 'bind_param'], refValues($params));
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $totalArticles = $row['count'];
-    $stmt->close();
-    $totalPages = max(1, ceil($totalArticles / $articlesPerPage));
-    // Fetch articles
-    $query = "SELECT * FROM articles WHERE category_id NOT IN ($placeholders) ORDER BY published_at DESC LIMIT ? OFFSET ?";
-    $stmt = $conn->prepare($query);
-    $params = array_merge([$types . 'ii'], $excludeCategoryIds, [$articlesPerPage, $offset]);
-    call_user_func_array([$stmt, 'bind_param'], refValues($params));
-    $stmt->execute();
-    $articles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-} else {
-    // Fallback: show all articles
-    $result = $conn->query("SELECT COUNT(*) as count FROM articles");
-    $row = $result->fetch_assoc();
-    $totalArticles = $row['count'];
-    $totalPages = max(1, ceil($totalArticles / $articlesPerPage));
-    $stmt = $conn->prepare("SELECT * FROM articles ORDER BY published_at DESC LIMIT ? OFFSET ?");
-    $stmt->bind_param("ii", $articlesPerPage, $offset);
-    $stmt->execute();
-    $articles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-}
-
-// Helper for call_user_func_array with references
-function refValues($arr) {
-    $refs = array();
-    foreach ($arr as $key => $value) {
-        $refs[$key] = &$arr[$key];
-    }
-    return $refs;
-}
-// $trendingArticles = $article->getTrending(2); // No longer needed
+// Fetch travel articles for the current page
+$stmt = $conn->prepare("SELECT * FROM articles WHERE category_id = (SELECT id FROM categories WHERE name = 'Travel' LIMIT 1) ORDER BY created_at DESC LIMIT ? OFFSET ?");
+$stmt->bind_param("ii", $articlesPerPage, $offset);
+$stmt->execute();
+$articles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!-- Category Navigation -->
@@ -71,12 +33,13 @@ function refValues($arr) {
         <a href="business.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-blue-600 hover:text-white">Business</a>
         <a href="sport.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-blue-600 hover:text-white">Sport</a>
         <a href="entertainment.php" class="px-4 py-2 bg-gray-200 rounded hover:bg-blue-600 hover:text-white">Entertainment</a>
+        <a href="travel.php" class="px-4 py-2 bg-blue-600 text-white rounded">Travel</a>
         <!-- Add more categories as needed -->
     </div>
 </div>
 
 <div class="max-w-7xl mx-auto px-4 py-8 fade-in">
-    <h1 class="text-4xl font-bold mb-8">News</h1>
+    <h1 class="text-4xl font-bold mb-8">Travel</h1>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-12">
         <?php echo displayArticles($articles); ?>
     </div>

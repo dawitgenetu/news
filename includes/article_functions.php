@@ -12,7 +12,7 @@ class Article {
         $stmt = $this->conn->prepare(
             "SELECT a.* FROM articles a
              JOIN categories c ON a.category_id = c.id
-             WHERE c.name = ? ORDER BY a.created_at DESC"
+             WHERE c.name = ? ORDER BY a.published_at DESC"
         );
         $stmt->bind_param("s", $category);
         $stmt->execute();
@@ -29,7 +29,7 @@ class Article {
     }
 
     public function getFeatured($limit = 3) {
-        $stmt = $this->conn->prepare("SELECT * FROM articles WHERE is_featured = 1 ORDER BY created_at DESC LIMIT ?");
+        $stmt = $this->conn->prepare("SELECT * FROM articles WHERE is_featured = 1 ORDER BY published_at DESC LIMIT ?");
         $stmt->bind_param("i", $limit);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -37,7 +37,7 @@ class Article {
     }
 
     public function getLatest($limit = 6) {
-        $stmt = $this->conn->prepare("SELECT * FROM articles ORDER BY created_at DESC LIMIT ?");
+        $stmt = $this->conn->prepare("SELECT * FROM articles ORDER BY published_at DESC LIMIT ?");
         $stmt->bind_param("i", $limit);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -79,14 +79,15 @@ class Article {
 function displayArticles($articles) {
     $output = '';
     foreach ($articles as $article) {
+        $img = !empty($article['local_image_path']) ? $article['local_image_path'] : $article['image_url'];
         $output .= '
         <a href="article.php?id=' . $article['id'] . '" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <img src="' . htmlspecialchars($article['image_url']) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-48 object-cover">
+            <img src="' . htmlspecialchars($img) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-48 object-cover">
             <div class="p-6">
                 <h3 class="text-xl font-semibold mb-2 text-gray-900">' . htmlspecialchars($article['title']) . '</h3>
                 <p class="text-gray-600 mb-4">' . htmlspecialchars(substr($article['content'], 0, 150)) . '...</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">' . date('M d, Y', strtotime($article['created_at'])) . '</span>
+                    <span class="text-sm text-gray-500">' . date('M d, Y', strtotime($article['published_at'])) . '</span>
                 </div>
             </div>
         </a>';
@@ -98,14 +99,15 @@ function displayArticles($articles) {
 function displayTrendingArticles($articles) {
     $output = '';
     foreach ($articles as $article) {
+        $img = !empty($article['local_image_path']) ? $article['local_image_path'] : $article['image_url'];
         $output .= '
         <a href="article.php?id=' . $article['id'] . '" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <img src="' . htmlspecialchars($article['image_url']) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-64 object-cover">
+            <img src="' . htmlspecialchars($img) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-64 object-cover">
             <div class="p-6">
                 <h3 class="text-2xl font-semibold mb-3 text-gray-900">' . htmlspecialchars($article['title']) . '</h3>
                 <p class="text-gray-600 mb-4">' . htmlspecialchars(substr($article['content'], 0, 200)) . '...</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">' . date('M d, Y', strtotime($article['created_at'])) . '</span>
+                    <span class="text-sm text-gray-500">' . date('M d, Y', strtotime($article['published_at'])) . '</span>
                 </div>
             </div>
         </a>';
@@ -117,15 +119,16 @@ function displayTrendingArticles($articles) {
 function displayFeaturedArticles($articles) {
     $output = '';
     foreach ($articles as $article) {
+        $img = !empty($article['local_image_path']) ? $article['local_image_path'] : $article['image_url'];
         $output .= '
         <a href="article.php?id=' . $article['id'] . '" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <img src="' . htmlspecialchars($article['image_url']) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-72 object-cover">
+            <img src="' . htmlspecialchars($img) . '" alt="' . htmlspecialchars($article['title']) . '" class="w-full h-72 object-cover">
             <div class="p-6">
                 <span class="text-sm text-blue-600 font-semibold">FEATURED</span>
                 <h3 class="text-2xl font-semibold mt-2 mb-3 text-gray-900">' . htmlspecialchars($article['title']) . '</h3>
                 <p class="text-gray-600 mb-4">' . htmlspecialchars(substr($article['content'], 0, 200)) . '...</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-500">By ' . htmlspecialchars($article['author']) . ' | ' . date('M d, Y', strtotime($article['created_at'])) . '</span>
+                    <span class="text-sm text-gray-500">By ' . htmlspecialchars($article['author']) . ' | ' . date('M d, Y', strtotime($article['published_at'])) . '</span>
                 </div>
             </div>
         </a>';

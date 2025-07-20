@@ -1,6 +1,6 @@
 <?php
 // borkena_scraper.php - Scrape news from borkena.com and upload to MySQL database
-set_time_limit(600);
+set_time_limit(0);
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db_config.php';
 
@@ -20,10 +20,12 @@ $categoryPages = [
     'politics' => 'https://borkena.com/category/politics/',
     'sport' => 'https://borkena.com/category/sport/',
     'video' => 'https://borkena.com/category/video/',
+    'travel' => 'https://borkena.com/category/travel/',
+    'restaurant' => 'https://borkena.com/category/restaurant/',
+    'health' => 'https://borkena.com/category/health/',
+    'technology' => 'https://borkena.com/category/technology/',
     // The following categories were removed due to broken or inaccessible URLs:
     // 'society' => 'https://borkena.com/category/society/',
-    // 'technology' => 'https://borkena.com/category/technology/',
-    // 'health' => 'https://borkena.com/category/health/',
     // 'education' => 'https://borkena.com/category/education/',
     // 'international' => 'https://borkena.com/category/international/'
 ];
@@ -239,7 +241,9 @@ function normalize_image_url($url) {
 }
 
 function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
+    $cutoffDate = date('Y-m-d');
     echo "\n=== Scraping category: $categoryName ===\n";
+    echo "Current date: $cutoffDate\n";
     $html = fetchUrl($categoryUrl, $userAgent);
     if (!$html) {
         echo "Failed to fetch category page: $categoryName\n";
@@ -256,7 +260,7 @@ function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
         return 0;
     }
     $count = 0;
-    $maxArticles = 10;
+    $maxArticles = 20;
     foreach ($articleNodes as $titleNode) {
         if ($count >= $maxArticles) break;
         $title = cleanText($titleNode->textContent);
@@ -290,6 +294,7 @@ function scrapeBorkenaCategory($categoryUrl, $userAgent, $categoryName, $db) {
         $excerpt = get_excerpt($content, 200);
         $published_at = extract_publish_date($axp);
         $categoryId = getOrCreateCategoryId($db, ucfirst($categoryName));
+        // No date filter: insert all articles regardless of date
         try {
             $slug = generate_slug($title);
             $stmt = $db->prepare("INSERT INTO articles (title, slug, content, excerpt, image_url, local_image_path, url, category_id, status, published_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'published', ?)");

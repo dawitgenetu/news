@@ -11,15 +11,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <!-- About Section -->
                 <div class="space-y-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="relative">
-                            <i class="fas fa-newspaper text-3xl text-blue-500"></i>
-                            <div class="absolute -top-1 -right-1 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                        </div>
-                        <div>
-                            <span class="text-2xl font-bold text-white font-['Poppins']">Borkena</span>
-                            <span class="text-lg text-gray-400 block">News</span>
-                        </div>
+                    <div class="flex items-center justify-center mb-4">
+                        <img src="images/borkena-logo.png" alt="Borkena News Logo" class="h-14 w-auto rounded-lg shadow-lg">
                     </div>
                     <p class="text-gray-400 leading-relaxed">Your trusted source for the latest news and updates from Ethiopia and around the world. Delivering accurate, timely, and comprehensive coverage.</p>
                     <div class="flex space-x-4">
@@ -63,6 +56,9 @@
                         <li><a href="privacy.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
                             <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             Privacy Policy</a></li>
+                        <li><a href="travel.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
+                            <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            Travel</a></li>
                     </ul>
                 </div>
 
@@ -76,9 +72,6 @@
                         <li><a href="news.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
                             <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             News</a></li>
-                        <li><a href="politics.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
-                            <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                            Politics</a></li>
                         <li><a href="business.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
                             <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             Business</a></li>
@@ -88,6 +81,12 @@
                         <li><a href="editorial.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
                             <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             Editorial</a></li>
+                        <li><a href="travel.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
+                            <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            Travel</a></li>
+                        <li><a href="health.php" class="flex items-center hover:text-blue-400 transition-colors duration-300 group">
+                            <i class="fa-solid fa-chevron-right mr-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            Health</a></li>
                     </ul>
                 </div>
 
